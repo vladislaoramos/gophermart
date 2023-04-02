@@ -7,10 +7,13 @@ import (
 	"github.com/pressly/goose"
 )
 
-const migrationDir = "migrations"
+const (
+	driver       = "postgres"
+	migrationDir = "migrations"
+)
 
 func applyMigration(dbURL string) error {
-	db, err := goose.OpenDBWithDriver("postgres", dbURL)
+	db, err := goose.OpenDBWithDriver(driver, dbURL)
 	if err != nil {
 		return fmt.Errorf("error open db: %w", err)
 	}

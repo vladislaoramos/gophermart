@@ -2,79 +2,142 @@ package repo
 
 import (
 	"context"
+	"fmt"
+	sq "github.com/Masterminds/squirrel"
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/shopspring/decimal"
 	"github.com/vladislaoramos/gophemart/internal/entity"
 	"github.com/vladislaoramos/gophemart/pkg/postgres"
 )
 
-type GophermartRepo struct {
+type LoyalSystemRepo struct {
 	*postgres.DB
 }
 
-func New(db *postgres.DB) *GophermartRepo {
-	return &GophermartRepo{db}
+func NewRepository(db *postgres.DB) *LoyalSystemRepo {
+	return &LoyalSystemRepo{db}
 }
 
-func (r *GophermartRepo) Ping(_ context.Context) error {
+func (r *LoyalSystemRepo) Ping(_ context.Context) error {
 	return nil
 }
 
-func (r *GophermartRepo) UpdateOrderAccrual(
+func (r *LoyalSystemRepo) UpdateOrderAccrual(
 	ctx context.Context, orderNumber string, accrual decimal.Decimal) error {
 	return nil
 }
 
-func (r *GophermartRepo) UpdateOrderStatus(
+func (r *LoyalSystemRepo) UpdateOrderStatus(
 	ctx context.Context, orderNumber, status string) error {
 	return nil
 }
 
-func (r *GophermartRepo) GetOrderByOrderNumber(
+func (r *LoyalSystemRepo) GetOrderByOrderNumber(
 	ctx context.Context, orderNumber string) (entity.Order, error) {
 	return entity.Order{}, nil
 }
 
-func (r *GophermartRepo) CreateUserBalance(
+func (r *LoyalSystemRepo) CreateUserBalance(
 	ctx context.Context, userID int) error {
+	query, args, err := r.Builder.
+		Insert("public.balance").
+		Columns("balance", "withdrawal", "user_id").
+		Values(0, 0, userID).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - CreateUserBalance - r.Builder: %w", err)
+	}
+
+	_, err = r.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - CreateUserBalance - r.Pool.Exec: %w", err)
+	}
 	return nil
 }
 
-func (r *GophermartRepo) CreateOrder(
+func (r *LoyalSystemRepo) CreateOrder(
 	ctx context.Context, userID int, orderNumber string) error {
 	return nil
 }
 
-func (r *GophermartRepo) CreateUser(
-	ctx context.Context, login, passwordHash string) (entity.User, error) {
-	return entity.User{}, nil
+func (r *LoyalSystemRepo) CreateUser(
+	ctx context.Context, login, pwdHash string) (entity.User, error) {
+	user := entity.User{
+		Login:        login,
+		PasswordHash: pwdHash,
+	}
+
+	query, args, err := r.Builder.
+		Insert("public.user").
+		Columns("login", "password_hash").
+		Values(login, pwdHash).
+		Suffix("RETURNING id").
+		ToSql()
+	if err != nil {
+		return entity.User{}, fmt.Errorf("LoyalSystemRepo - CreateUser - r.Builder: %w", err)
+	}
+
+	tx, err := r.Pool.Begin(ctx)
+	if err != nil {
+		return entity.User{}, fmt.Errorf("LoyalSystemRepo - CreateUser - r.Pool.Begin: %w", err)
+	}
+	defer tx.Rollback(ctx)
+
+	err = tx.QueryRow(ctx, query, args...).Scan(&user.ID)
+	if err != nil {
+		return entity.User{}, fmt.Errorf("LoyalSystemRepo - CreateUser - tx.QueryRow: %w", err)
+	}
+
+	tx.Commit(ctx)
+
+	return user, nil
 }
 
-func (r *GophermartRepo) GetUserWithLogin(
+func (r *LoyalSystemRepo) GetUserWithLogin(
 	ctx context.Context, login string) (entity.User, error) {
-	return entity.User{}, nil
+	query, args, err := r.Builder.
+		Select("id", "login", "password_hash").
+		From("public.user").
+		Where(sq.Eq{"login": login}).
+		ToSql()
+
+	if err != nil {
+		return entity.User{}, fmt.Errorf("LoyalSystemRepo - GetUserWithLogin - r.Builder: %w", err)
+	}
+
+	dst := make([]entity.User, 0)
+	if err = pgxscan.Select(ctx, r.Pool, &dst, query, args...); err != nil {
+		return entity.User{}, fmt.Errorf("LoyalSystemRepo - GetUserWithLogin - pgxscan.Select: %w", err)
+	}
+
+	if len(dst) == 0 {
+		return entity.User{}, ErrNotFound
+	}
+
+	return dst[0], nil
 }
 
-func (r *GophermartRepo) GetOrderList(
+func (r *LoyalSystemRepo) GetOrderList(
 	ctx context.Context, userID int) ([]entity.Order, error) {
 	return nil, nil
 }
 
-func (r *GophermartRepo) GetCurrentBalance(
+func (r *LoyalSystemRepo) GetBalance(
 	ctx context.Context, userID int) (entity.Balance, error) {
 	return entity.Balance{}, nil
 }
 
-func (r *GophermartRepo) UpdateBalance(
+func (r *LoyalSystemRepo) UpdateBalance(
 	ctx context.Context, userID int, balance, withdrawal decimal.Decimal) error {
 	return nil
 }
 
-func (r *GophermartRepo) AddWithdrawal(
+func (r *LoyalSystemRepo) AddWithdrawal(
 	ctx context.Context, userID int, orderNum string, value decimal.Decimal) error {
 	return nil
 }
 
-func (r *GophermartRepo) GetWithdrawalList(
+func (r *LoyalSystemRepo) GetWithdrawalList(
 	ctx context.Context, userID int, orderNum string) ([]entity.Withdraw, error) {
 	return nil, nil
 }

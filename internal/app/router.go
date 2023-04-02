@@ -8,18 +8,18 @@ import (
 	"github.com/vladislaoramos/gophemart/pkg/logger"
 )
 
-func NewRouter(handler *chi.Mux, uc usecase.Gophermart, l logger.LogInterface) {
+func NewRouter(handler *chi.Mux, ls usecase.LoyalSystem, log logger.LogInterface) {
 	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
 
 	handler.Use(middleware.Logger)
 
 	// checker
-	handler.Get("/ping", pingHandler(uc, l))
+	handler.Get("/ping", pingHandler(ls))
 
 	// auth
 	handler.Group(func(r chi.Router) {
-		r.Post("/api/user/register", registrationUser(uc, l, tokenAuth))
-		r.Post("/api/user/login", loginUser(uc, l, tokenAuth))
+		r.Post("/api/user/register", registrationUser(ls, log, tokenAuth))
+		r.Post("/api/user/login", loginUser(ls, log, tokenAuth))
 	})
 
 	// Protected routes
@@ -27,12 +27,12 @@ func NewRouter(handler *chi.Mux, uc usecase.Gophermart, l logger.LogInterface) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
 
-		r.Post("/api/user/orders", uploadOrder(uc, l, tokenAuth))
-		r.Get("/api/user/orders", getOrderInfoList(uc, l, tokenAuth))
+		r.Post("/api/user/orders", uploadOrder(ls, log, tokenAuth))
+		r.Get("/api/user/orders", getOrderInfoList(ls, log, tokenAuth))
 
-		r.Get("/api/user/balance", getCurrentBalance(uc, l, tokenAuth))
-		r.Post("/api/user/balance/withdraw", withdraw(uc, l, tokenAuth))
+		r.Get("/api/user/balance", getCurrentBalance(ls, log, tokenAuth))
+		r.Post("/api/user/balance/withdraw", withdraw(ls, log, tokenAuth))
 
-		r.Get("/api/user/withdrawals", getWithdrawInfoList(uc, l, tokenAuth))
+		r.Get("/api/user/withdrawals", getWithdrawInfoList(ls, log, tokenAuth))
 	})
 }

@@ -8,22 +8,22 @@ import (
 	"github.com/vladislaoramos/gophemart/internal/entity"
 )
 
-type Gophermart interface {
+type LoyalSystem interface {
 	PingRepo(context.Context) error
-	CreateNewUser(context.Context, entity.UserAuth) (entity.User, error)
+	CreateUser(context.Context, entity.UserAuth) (entity.User, error)
 	CheckUser(context.Context, entity.UserAuth) (entity.User, error)
 
 	UploadOrder(context.Context, int, string) (bool, error)
 	GetOrderList(context.Context, int) ([]entity.Order, error)
 
-	GetCurrentBalance(context.Context, int) (entity.Balance, error)
+	GetBalance(context.Context, int) (entity.Balance, error)
 	Withdraw(context.Context, int, entity.Withdrawal) error
 
 	GetWithdrawList(context.Context, int) ([]entity.Withdraw, error)
 	ProcessOrder(string) error
 }
 
-type GophermartRepo interface {
+type LoyalSystemRepo interface {
 	Ping(context.Context) error
 
 	CreateUser(context.Context, string, string) (entity.User, error)
@@ -32,7 +32,7 @@ type GophermartRepo interface {
 
 	GetOrderList(context.Context, int) ([]entity.Order, error)
 
-	GetCurrentBalance(context.Context, int) (entity.Balance, error)
+	GetBalance(context.Context, int) (entity.Balance, error)
 	UpdateBalance(context.Context, int, decimal.Decimal, decimal.Decimal) error
 	AddWithdrawal(context.Context, int, string, decimal.Decimal) error
 
@@ -44,6 +44,6 @@ type GophermartRepo interface {
 	UpdateOrderAccrual(context.Context, string, decimal.Decimal) error
 }
 
-type GophermartWebAPI interface {
+type LoyalSystemAPI interface {
 	GetOrderInfo(string) (entity.Order, time.Duration, error)
 }

@@ -7,16 +7,16 @@ import (
 	"github.com/vladislaoramos/gophemart/internal/entity"
 )
 
-type GophermartWebAPI struct {
+type LoyalSystemWebAPI struct {
 	client *resty.Client
 }
 
-func New(client *resty.Client) *GophermartWebAPI {
-	return &GophermartWebAPI{
+func NewAPI(client *resty.Client) *LoyalSystemWebAPI {
+	return &LoyalSystemWebAPI{
 		client: client,
 	}
 }
 
-func (w *GophermartWebAPI) GetOrderInfo(orderNumber string) (entity.Order, time.Duration, error) {
+func (w *LoyalSystemWebAPI) GetOrderInfo(orderNumber string) (entity.Order, time.Duration, error) {
 	return entity.Order{}, 0, nil
 }

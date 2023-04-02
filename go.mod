@@ -4,6 +4,7 @@ go 1.20
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
+	github.com/georgysavva/scany v1.2.1
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/jwtauth/v5 v5.1.0
@@ -14,6 +15,7 @@ require (
 	github.com/pressly/goose v2.7.0+incompatible
 	github.com/shopspring/decimal v1.3.1
 	github.com/sirupsen/logrus v1.9.0
+	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
 )
 
 require (
@@ -38,7 +40,6 @@ require (
 	github.com/lestrrat-go/jwx/v2 v2.0.6 // indirect
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/net v0.0.0-20211112202133-69e39bad7dc2 // indirect
 	golang.org/x/sys v0.0.0-20220715151400-c0bba94af5f8 // indirect
 	golang.org/x/text v0.3.6 // indirect
