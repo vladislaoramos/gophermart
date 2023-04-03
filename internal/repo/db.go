@@ -34,7 +34,26 @@ func (r *LoyalSystemRepo) UpdateOrderStatus(
 
 func (r *LoyalSystemRepo) GetOrderByOrderNumber(
 	ctx context.Context, orderNumber string) (entity.Order, error) {
-	return entity.Order{}, nil
+	query, args, err := r.Builder.
+		Select("order_number", "status", "accrual", "uploaded_at", "user_id").
+		From("public.order").
+		Where(sq.Eq{"order_number": orderNumber}).
+		OrderBy("uploaded_at").
+		ToSql()
+	if err != nil {
+		return entity.Order{}, fmt.Errorf("LoyalSystemRepo - GetOrderByOrderNumber - r.Builder: %w", err)
+	}
+
+	dst := make([]entity.Order, 0)
+	if err = pgxscan.Select(ctx, r.Pool, &dst, query, args...); err != nil {
+		return entity.Order{}, fmt.Errorf("LoyalSystemRepo - GetOrderByOrderNumber - pgxsan.Select: %w", err)
+	}
+
+	if len(dst) == 0 {
+		return entity.Order{}, ErrNotFound
+	}
+
+	return dst[0], nil
 }
 
 func (r *LoyalSystemRepo) CreateUserBalance(
@@ -57,6 +76,20 @@ func (r *LoyalSystemRepo) CreateUserBalance(
 
 func (r *LoyalSystemRepo) CreateOrder(
 	ctx context.Context, userID int, orderNumber string) error {
+	query, args, err := r.Builder.
+		Insert("public.order").
+		Columns("order_number", "user_id", "accrual").
+		Values(orderNumber, userID, 0).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - CreateOrder - r.Builder: %w", err)
+	}
+
+	_, err = r.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - CreateOrder - r.Pool.Exec: %w", err)
+	}
+
 	return nil
 }
 
@@ -119,7 +152,21 @@ func (r *LoyalSystemRepo) GetUserWithLogin(
 
 func (r *LoyalSystemRepo) GetOrderList(
 	ctx context.Context, userID int) ([]entity.Order, error) {
-	return nil, nil
+	query, args, err := r.Builder.
+		Select("order_number", "status", "accrual", "uploaded_at").
+		From("public.order").
+		Where(sq.Eq{"user_id": userID}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("LoyalSystemRepo - GetOrderList - r.Builder: %w", err)
+	}
+
+	dst := make([]entity.Order, 0)
+	if err = pgxscan.Select(ctx, r.Pool, &dst, query, args...); err != nil {
+		return nil, fmt.Errorf("LoyalSystemRepo - GetOrderList - pgxscan.Select: %w", err)
+	}
+
+	return dst, nil
 }
 
 func (r *LoyalSystemRepo) GetBalance(

@@ -15,6 +15,7 @@ require (
 	github.com/pressly/goose v2.7.0+incompatible
 	github.com/shopspring/decimal v1.3.1
 	github.com/sirupsen/logrus v1.9.0
+	github.com/theplant/luhn v0.0.0-20170224032821-81a1a381387a
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
 )
 

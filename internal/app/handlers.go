@@ -3,10 +3,13 @@ package app
 import (
 	"encoding/json"
 	"github.com/go-chi/jwtauth/v5"
+	"github.com/theplant/luhn"
 	"github.com/vladislaoramos/gophemart/internal/entity"
 	"github.com/vladislaoramos/gophemart/internal/usecase"
 	"github.com/vladislaoramos/gophemart/pkg/logger"
+	"io"
 	"net/http"
+	"strconv"
 )
 
 func registrationUser(
@@ -84,10 +87,63 @@ func getCurrentBalance(_ usecase.LoyalSystem, _ logger.LogInterface, _ *jwtauth.
 	return func(w http.ResponseWriter, r *http.Request) {}
 }
 
-func getOrderInfoList(_ usecase.LoyalSystem, _ logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+func getOrderInfoList(ls usecase.LoyalSystem, log logger.LogInterface) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		orderList, err := ls.GetOrderList(r.Context(), int(claims["user_id"].(float64)))
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		if orderList == nil {
+			http.Error(w, "empty order list", http.StatusNoContent)
+			return
+		}
+
+		jsonResp, err := json.Marshal(orderList)
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResp)
+	}
 }
 
-func uploadOrder(_ usecase.LoyalSystem, _ logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+func uploadOrder(
+	ls usecase.LoyalSystem,
+	log logger.LogInterface,
+) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Error(err.Error())
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		orderNum, _ := strconv.Atoi(string(body))
+		if !luhn.Valid(orderNum) {
+			log.Error(err.Error())
+			http.Error(w, "bad request", http.StatusUnprocessableEntity)
+			return
+		}
+
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		isAlreadyUploaded, err := ls.UploadOrder(r.Context(), int(claims["user_id"].(float64)), strconv.Itoa(orderNum))
+		if err != nil {
+			errorHandler(w, err)
+			return
+		}
+
+		if isAlreadyUploaded {
+			w.WriteHeader(http.StatusOK)
+		} else {
+			w.WriteHeader(http.StatusAccepted)
+		}
+	}
 }

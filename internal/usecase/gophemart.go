@@ -2,7 +2,10 @@ package usecase
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/vladislaoramos/gophemart/internal/entity"
+	"github.com/vladislaoramos/gophemart/internal/repo"
 	"github.com/vladislaoramos/gophemart/pkg/auth"
 	"github.com/vladislaoramos/gophemart/pkg/logger"
 )
@@ -94,12 +97,37 @@ func (ls *LoyalSystemUseCase) PingRepo(ctx context.Context) error {
 	return ls.repo.Ping(ctx)
 }
 
-func (ls *LoyalSystemUseCase) UploadOrder(ctx context.Context, userID int, orderNum string) (bool, error) {
+func (ls *LoyalSystemUseCase) UploadOrder(
+	ctx context.Context,
+	userID int,
+	orderNum string,
+) (bool, error) {
+	order, err := ls.repo.GetOrderByOrderNumber(ctx, orderNum)
+	if err == nil {
+		if order.UserID == userID {
+			return true, nil
+		}
+		return false, ErrConflict
+	}
+
+	if errors.Is(err, repo.ErrNotFound) {
+		err = ls.repo.CreateOrder(ctx, userID, orderNum)
+		if err != nil {
+			return false, fmt.Errorf("LoyalSystemUseCase - UploadOrder - ls.repo.CreateOrder: %w", err)
+		}
+		ls.orderCh <- orderNum
+	}
+
+	if err != nil {
+		return false, fmt.Errorf("LoyalSystemUseCase - UploadOrder - ls.repo.GetOrderByOrderNumber: %w", err)
+	}
+
 	return false, nil
 }
 
 func (ls *LoyalSystemUseCase) GetOrderList(ctx context.Context, userID int) ([]entity.Order, error) {
-	return nil, nil
+	orderList, err := ls.repo.GetOrderList(ctx, userID)
+	return orderList, err
 }
 
 func (ls *LoyalSystemUseCase) GetBalance(ctx context.Context, userID int) (entity.Balance, error) {

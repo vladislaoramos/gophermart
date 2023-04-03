@@ -27,8 +27,8 @@ func NewRouter(handler *chi.Mux, ls usecase.LoyalSystem, log logger.LogInterface
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator)
 
-		r.Post("/api/user/orders", uploadOrder(ls, log, tokenAuth))
-		r.Get("/api/user/orders", getOrderInfoList(ls, log, tokenAuth))
+		r.Post("/api/user/orders", uploadOrder(ls, log))
+		r.Get("/api/user/orders", getOrderInfoList(ls, log))
 
 		r.Get("/api/user/balance", getCurrentBalance(ls, log, tokenAuth))
 		r.Post("/api/user/balance/withdraw", withdraw(ls, log, tokenAuth))
