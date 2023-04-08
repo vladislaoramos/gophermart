@@ -187,7 +187,6 @@ func uploadOrder(
 
 		orderNum, _ := strconv.Atoi(string(body))
 		if !luhn.Valid(orderNum) {
-			log.Error(err.Error())
 			http.Error(w, "bad request", http.StatusUnprocessableEntity)
 			return
 		}
