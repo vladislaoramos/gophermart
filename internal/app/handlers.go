@@ -75,16 +75,75 @@ func pingHandler(ls usecase.LoyalSystem) http.HandlerFunc {
 	}
 }
 
-func getWithdrawInfoList(_ usecase.LoyalSystem, _ logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+func getWithdrawList(ls usecase.LoyalSystem, log logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		wl, err := ls.GetWithdrawList(r.Context(), int(claims["user_id"].(float64)))
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		jsonResp, err := json.Marshal(wl)
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResp)
+	}
 }
 
-func withdraw(_ usecase.LoyalSystem, _ logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+func withdraw(ls usecase.LoyalSystem, log logger.LogInterface) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var withdrawal entity.Withdrawal
+
+		if err := json.NewDecoder(r.Body).Decode(&withdrawal); err != nil {
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		orderNum, _ := strconv.Atoi(withdrawal.Order)
+		if !luhn.Valid(orderNum) {
+			http.Error(w, "bad request", http.StatusUnprocessableEntity)
+			return
+		}
+
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		err := ls.Withdraw(r.Context(), int(claims["user_id"].(float64)), withdrawal)
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}
 }
 
-func getCurrentBalance(_ usecase.LoyalSystem, _ logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {}
+func getBalance(ls usecase.LoyalSystem, log logger.LogInterface, _ *jwtauth.JWTAuth) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		_, claims, _ := jwtauth.FromContext(r.Context())
+		balance, err := ls.GetBalance(r.Context(), int(claims["user_id"].(float64)))
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		jsonResp, err := json.Marshal(balance)
+		if err != nil {
+			log.Error(err.Error())
+			errorHandler(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(jsonResp)
+	}
 }
 
 func getOrderInfoList(ls usecase.LoyalSystem, log logger.LogInterface) http.HandlerFunc {

@@ -171,20 +171,84 @@ func (r *LoyalSystemRepo) GetOrderList(
 
 func (r *LoyalSystemRepo) GetBalance(
 	ctx context.Context, userID int) (entity.Balance, error) {
-	return entity.Balance{}, nil
+	query, args, err := r.Builder.
+		Select("balance", "withdrawal").
+		From("public.balance").
+		Where(sq.Eq{"user_id": userID}).
+		ToSql()
+	if err != nil {
+		return entity.Balance{}, fmt.Errorf("LoyalSystemRepo - GetBalance - r.Builder: %w", err)
+	}
+
+	dst := make([]entity.Balance, 0)
+	if err = pgxscan.Select(ctx, r.Pool, &dst, query, args...); err != nil {
+		return entity.Balance{}, fmt.Errorf("LoyalSystemRepo - GetBalance - pgxsan.Select: %w", err)
+	}
+
+	if len(dst) == 0 {
+		return entity.Balance{}, ErrNotFound
+	}
+
+	return dst[0], nil
 }
 
 func (r *LoyalSystemRepo) UpdateBalance(
 	ctx context.Context, userID int, balance, withdrawal decimal.Decimal) error {
+	query, args, err := r.Builder.
+		Update("public.balance").
+		Set("balance", balance).
+		Set("withdrawal", withdrawal).
+		Where(sq.Eq{"user_id": userID}).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - UpdateBalance - r.Builder: %w", err)
+	}
+
+	_, err = r.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - UpdateBalance - r.Pool.Exec: %w", err)
+	}
 	return nil
 }
 
 func (r *LoyalSystemRepo) AddWithdrawal(
 	ctx context.Context, userID int, orderNum string, value decimal.Decimal) error {
+	query, args, err := r.Builder.
+		Insert("public.withdrawal").
+		Columns("order_number", "sum_number", "user_id").
+		Values(orderNum, value, userID).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - AddWithdrawal - r.Builder: %w", err)
+	}
+
+	_, err = r.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - AddWithdrawal - r.Pool.Exec: %w", err)
+	}
+
 	return nil
 }
 
 func (r *LoyalSystemRepo) GetWithdrawalList(
-	ctx context.Context, userID int, orderNum string) ([]entity.Withdraw, error) {
-	return nil, nil
+	ctx context.Context, userID int) ([]entity.Withdraw, error) {
+	query, args, err := r.Builder.
+		Select("order_number", "sum_number", "updated_at").
+		From("public.withdrawal").
+		Where(sq.Eq{"user_id": userID}).
+		ToSql()
+	if err != nil {
+		return nil, fmt.Errorf("LoyalSystemRepo - GetWithdrawalList - r.Builder: %w", err)
+	}
+
+	dst := make([]entity.Withdraw, 0)
+	if err = pgxscan.Select(ctx, r.Pool, &dst, query, args...); err != nil {
+		return nil, fmt.Errorf("LoyalSystemRepo - GetWithdrawalList - pgxscan.Select: %w", err)
+	}
+
+	if len(dst) == 0 {
+		return nil, nil
+	}
+
+	return dst, nil
 }

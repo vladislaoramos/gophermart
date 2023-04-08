@@ -126,18 +126,36 @@ func (ls *LoyalSystemUseCase) UploadOrder(
 }
 
 func (ls *LoyalSystemUseCase) GetOrderList(ctx context.Context, userID int) ([]entity.Order, error) {
-	orderList, err := ls.repo.GetOrderList(ctx, userID)
-	return orderList, err
+	return ls.repo.GetOrderList(ctx, userID)
 }
 
 func (ls *LoyalSystemUseCase) GetBalance(ctx context.Context, userID int) (entity.Balance, error) {
-	return entity.Balance{}, nil
+	return ls.repo.GetBalance(ctx, userID)
 }
 
 func (ls *LoyalSystemUseCase) Withdraw(ctx context.Context, userID int, withdrawal entity.Withdrawal) error {
+	balance, err := ls.repo.GetBalance(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	if withdrawal.Sum.GreaterThan(balance.Current) {
+		return ErrPaymentRequired
+	}
+
+	err = ls.repo.UpdateBalance(ctx, userID, balance.Current.Sub(withdrawal.Sum), balance.Withdraw.Add(withdrawal.Sum))
+	if err != nil {
+		return err
+	}
+
+	err = ls.repo.AddWithdrawal(ctx, userID, withdrawal.Order, withdrawal.Sum)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (ls *LoyalSystemUseCase) GetWithdrawList(ctx context.Context, userID int) ([]entity.Withdraw, error) {
-	return nil, nil
+	return ls.repo.GetWithdrawalList(ctx, userID)
 }

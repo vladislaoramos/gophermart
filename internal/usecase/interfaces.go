@@ -36,7 +36,7 @@ type LoyalSystemRepo interface {
 	UpdateBalance(context.Context, int, decimal.Decimal, decimal.Decimal) error
 	AddWithdrawal(context.Context, int, string, decimal.Decimal) error
 
-	GetWithdrawalList(context.Context, int, string) ([]entity.Withdraw, error)
+	GetWithdrawalList(context.Context, int) ([]entity.Withdraw, error)
 
 	GetOrderByOrderNumber(context.Context, string) (entity.Order, error)
 	CreateOrder(context.Context, int, string) error

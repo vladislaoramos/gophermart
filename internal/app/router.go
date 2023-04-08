@@ -30,9 +30,9 @@ func NewRouter(handler *chi.Mux, ls usecase.LoyalSystem, log logger.LogInterface
 		r.Post("/api/user/orders", uploadOrder(ls, log))
 		r.Get("/api/user/orders", getOrderInfoList(ls, log))
 
-		r.Get("/api/user/balance", getCurrentBalance(ls, log, tokenAuth))
-		r.Post("/api/user/balance/withdraw", withdraw(ls, log, tokenAuth))
+		r.Get("/api/user/balance", getBalance(ls, log, tokenAuth))
+		r.Post("/api/user/balance/withdraw", withdraw(ls, log))
 
-		r.Get("/api/user/withdrawals", getWithdrawInfoList(ls, log, tokenAuth))
+		r.Get("/api/user/withdrawals", getWithdrawList(ls, log, tokenAuth))
 	})
 }
