@@ -20,7 +20,7 @@ type LoyalSystem interface {
 	Withdraw(context.Context, int, entity.Withdrawal) error
 
 	GetWithdrawList(context.Context, int) ([]entity.Withdraw, error)
-	ProcessOrder(string) error
+	//ProcessOrder(string) error
 }
 
 type LoyalSystemRepo interface {
