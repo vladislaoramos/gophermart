@@ -24,11 +24,38 @@ func (r *LoyalSystemRepo) Ping(_ context.Context) error {
 
 func (r *LoyalSystemRepo) UpdateOrderAccrual(
 	ctx context.Context, orderNumber string, accrual decimal.Decimal) error {
+	query, args, err := r.Builder.
+		Update("public.orders").
+		Set("accrual", accrual).
+		Where(sq.Eq{"order_number": orderNumber}).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - UpdateOrderAccrual - r.Builder: %w", err)
+	}
+
+	_, err = r.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - UpdateOrderAccrual - r.Pool.Exec: %w", err)
+	}
 	return nil
 }
 
 func (r *LoyalSystemRepo) UpdateOrderStatus(
 	ctx context.Context, orderNumber, status string) error {
+	query, args, err := r.Builder.
+		Update("public.orders").
+		Set("status", status).
+		Where(sq.Eq{"order_number": orderNumber}).
+		ToSql()
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - UpdateOrderStatus - r.builder: %w", err)
+	}
+
+	_, err = r.Pool.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("LoyalSystemRepo - UpdateOrderStatus - r.Pool.Exec: %w", err)
+	}
+
 	return nil
 }
 
