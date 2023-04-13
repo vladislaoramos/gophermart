@@ -1,15 +1,15 @@
 -- +goose Up
 -- +goose StatementBegin
-SELECT 'up SQL query';
-CREATE TABLE IF NOT EXISTS public.user (
-    id serial PRIMARY KEY,
-    login VARCHAR(64) UNIQUE,
-    password_hash VARCHAR(64)
+select 'up SQL query';
+create table if not exists public.users (
+    id serial primary key,
+    login varchar(64) unique,
+    password_hash varchar(64)
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-SELECT 'down SQL query';
-DROP TABLE public.user;
+select 'down SQL query';
+drop table public.users;
 -- +goose StatementEnd

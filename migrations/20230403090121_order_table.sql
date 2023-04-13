@@ -1,20 +1,19 @@
 -- +goose Up
 -- +goose StatementBegin
-SELECT 'up SQL query';
-CREATE TABLE public.order (
+select 'up SQL query';
+create table if not exists public.orders (
     id serial primary key,
     order_number text,
     status varchar(32) default 'NEW',
     accrual decimal,
     uploaded_at timestamp default now(),
     user_id int,
-    constraint FK_order_user foreign key (user_id) references public.user (id)
+    constraint FK_order_user foreign key (user_id) references public.users (id)
 );
-
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-SELECT 'down SQL query';
-DROP TABLE public.order;
+select 'down SQL query';
+drop table public.orders;
 -- +goose StatementEnd

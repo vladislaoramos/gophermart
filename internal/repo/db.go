@@ -36,7 +36,7 @@ func (r *LoyalSystemRepo) GetOrderByOrderNumber(
 	ctx context.Context, orderNumber string) (entity.Order, error) {
 	query, args, err := r.Builder.
 		Select("order_number", "status", "accrual", "uploaded_at", "user_id").
-		From("public.order").
+		From("public.orders").
 		Where(sq.Eq{"order_number": orderNumber}).
 		OrderBy("uploaded_at").
 		ToSql()
@@ -77,7 +77,7 @@ func (r *LoyalSystemRepo) CreateUserBalance(
 func (r *LoyalSystemRepo) CreateOrder(
 	ctx context.Context, userID int, orderNumber string) error {
 	query, args, err := r.Builder.
-		Insert("public.order").
+		Insert("public.orders").
 		Columns("order_number", "user_id", "accrual").
 		Values(orderNumber, userID, 0).
 		ToSql()
@@ -101,7 +101,7 @@ func (r *LoyalSystemRepo) CreateUser(
 	}
 
 	query, args, err := r.Builder.
-		Insert("public.user").
+		Insert("public.users").
 		Columns("login", "password_hash").
 		Values(login, pwdHash).
 		Suffix("RETURNING id").
@@ -130,7 +130,7 @@ func (r *LoyalSystemRepo) GetUserWithLogin(
 	ctx context.Context, login string) (entity.User, error) {
 	query, args, err := r.Builder.
 		Select("id", "login", "password_hash").
-		From("public.user").
+		From("public.users").
 		Where(sq.Eq{"login": login}).
 		ToSql()
 
@@ -154,7 +154,7 @@ func (r *LoyalSystemRepo) GetOrderList(
 	ctx context.Context, userID int) ([]entity.Order, error) {
 	query, args, err := r.Builder.
 		Select("order_number", "status", "accrual", "uploaded_at").
-		From("public.order").
+		From("public.orders").
 		Where(sq.Eq{"user_id": userID}).
 		ToSql()
 	if err != nil {
