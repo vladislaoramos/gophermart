@@ -13,13 +13,13 @@ type Config struct {
 }
 
 type App struct {
-	Name                 string `env-required:"true" env-default:"gophemart"`
+	Name                 string `env-default:"gophemart"`
 	Version              string `default:"0.0.1"`
-	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS" env-required:"true"`
+	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
 
 type Client struct {
-	Address string `env-required:"true" env:"RUN_ADDRESS"`
+	Address string `env:"RUN_ADDRESS" env-default:"localhost:8080"`
 }
 
 type Logger struct {
@@ -27,7 +27,7 @@ type Logger struct {
 }
 
 type Database struct {
-	URI string `env:"DATABASE_URI" env-required:"true"`
+	URI string `env:"DATABASE_URI"`
 }
 
 func (cfg *Config) parseFlags() {
