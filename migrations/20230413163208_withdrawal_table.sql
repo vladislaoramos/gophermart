@@ -5,7 +5,7 @@ select 'up SQL query';
 create table if not exists public.withdrawal (
     id serial primary key,
     order_number text,
-    sum_number decimal,
+    sum_number float,
     updated_at timestamp default now(),
     user_id int,
     constraint FK_withdrawal_user foreign key (user_id) references public.users (id)

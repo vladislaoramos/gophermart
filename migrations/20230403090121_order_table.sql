@@ -5,7 +5,7 @@ create table if not exists public.orders (
     id serial primary key,
     order_number text,
     status varchar(32) default 'NEW',
-    accrual decimal,
+    accrual float,
     uploaded_at timestamp default now(),
     user_id int,
     constraint FK_order_user foreign key (user_id) references public.users (id)

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/pgxscan"
-	"github.com/shopspring/decimal"
 	"github.com/vladislaoramos/gophemart/internal/entity"
 	"github.com/vladislaoramos/gophemart/pkg/postgres"
 )
@@ -23,7 +22,7 @@ func (r *LoyalSystemRepo) Ping(_ context.Context) error {
 }
 
 func (r *LoyalSystemRepo) UpdateOrderAccrual(
-	ctx context.Context, orderNumber string, accrual decimal.Decimal) error {
+	ctx context.Context, orderNumber string, accrual float64) error {
 	query, args, err := r.Builder.
 		Update("public.orders").
 		Set("accrual", accrual).
@@ -220,7 +219,7 @@ func (r *LoyalSystemRepo) GetBalance(
 }
 
 func (r *LoyalSystemRepo) UpdateBalance(
-	ctx context.Context, userID int, balance, withdrawal decimal.Decimal) error {
+	ctx context.Context, userID int, balance, withdrawal float64) error {
 	query, args, err := r.Builder.
 		Update("public.balance").
 		Set("balance", balance).
@@ -239,7 +238,7 @@ func (r *LoyalSystemRepo) UpdateBalance(
 }
 
 func (r *LoyalSystemRepo) AddWithdrawal(
-	ctx context.Context, userID int, orderNum string, value decimal.Decimal) error {
+	ctx context.Context, userID int, orderNum string, value float64) error {
 	query, args, err := r.Builder.
 		Insert("public.withdrawal").
 		Columns("order_number", "sum_number", "user_id").

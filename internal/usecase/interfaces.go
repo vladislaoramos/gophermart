@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/shopspring/decimal"
 	"github.com/vladislaoramos/gophemart/internal/entity"
 )
 
@@ -33,15 +32,15 @@ type LoyalSystemRepo interface {
 	GetOrderList(context.Context, int) ([]entity.Order, error)
 
 	GetBalance(context.Context, int) (entity.Balance, error)
-	UpdateBalance(context.Context, int, decimal.Decimal, decimal.Decimal) error
-	AddWithdrawal(context.Context, int, string, decimal.Decimal) error
+	UpdateBalance(context.Context, int, float64, float64) error
+	AddWithdrawal(context.Context, int, string, float64) error
 
 	GetWithdrawalList(context.Context, int) ([]entity.Withdraw, error)
 
 	GetOrderByOrderNumber(context.Context, string) (entity.Order, error)
 	CreateOrder(context.Context, int, string) error
 	UpdateOrderStatus(context.Context, string, string) error
-	UpdateOrderAccrual(context.Context, string, decimal.Decimal) error
+	UpdateOrderAccrual(context.Context, string, float64) error
 }
 
 type LoyalSystemAPI interface {
