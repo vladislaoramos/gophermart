@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/vladislaoramos/gophemart/configs"
-	"github.com/vladislaoramos/gophemart/internal/app"
-	"github.com/vladislaoramos/gophemart/pkg/logger"
+	"github.com/vladislaoramos/gophermart/configs"
+	"github.com/vladislaoramos/gophermart/internal/app"
+	"github.com/vladislaoramos/gophermart/pkg/logger"
 	stdLog "log"
 	"os"
 )

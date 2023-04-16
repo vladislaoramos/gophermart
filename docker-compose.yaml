@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  db:
+    container_name: gophermart-db
+    image: postgres:13-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: gopher
+      POSTGRES_PASSWORD: gopher
+      POSTGRES_DB: gophermart
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: gophermart-app
+    image: app
+    restart: always
+    environment:
+      DATABASE_URI: "postgres://gopher:gopher@localhost:5432/gophermart?sslmode=disable"
+      ADDRESS: ":8080"
+    depends_on:
+      - db
+    ports:
+      - 8080:8080
+
+volumes:
+  postgres_data:

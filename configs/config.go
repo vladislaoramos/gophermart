@@ -13,7 +13,7 @@ type Config struct {
 }
 
 type App struct {
-	Name                 string `env-default:"gophemart"`
+	Name                 string `env-default:"gophermart"`
 	Version              string `default:"0.0.1"`
 	AccrualSystemAddress string `env:"ACCRUAL_SYSTEM_ADDRESS"`
 }
@@ -53,7 +53,7 @@ func (cfg *Config) updateConfig(v *Config) {
 }
 
 const (
-	appName            = "gophemart"
+	appName            = "gophermart"
 	appVersion         = "0.0.1"
 	loggerDefaultLevel = "debug"
 )

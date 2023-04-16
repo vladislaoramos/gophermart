@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/vladislaoramos/gophemart/internal/usecase"
+	"github.com/vladislaoramos/gophermart/internal/usecase"
 )
 
 func errorHandler(w http.ResponseWriter, err error) {

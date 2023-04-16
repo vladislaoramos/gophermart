@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/vladislaoramos/gophemart/internal/entity"
+	"github.com/vladislaoramos/gophermart/internal/entity"
 )
 
 type LoyalSystem interface {

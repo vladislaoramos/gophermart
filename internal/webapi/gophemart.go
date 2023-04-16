@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/vladislaoramos/gophemart/internal/entity"
+	"github.com/vladislaoramos/gophermart/internal/entity"
 )
 
 type LoyalSystemWebAPI struct {

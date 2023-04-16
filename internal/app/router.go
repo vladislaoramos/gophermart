@@ -4,8 +4,8 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/jwtauth/v5"
-	"github.com/vladislaoramos/gophemart/internal/usecase"
-	"github.com/vladislaoramos/gophemart/pkg/logger"
+	"github.com/vladislaoramos/gophermart/internal/usecase"
+	"github.com/vladislaoramos/gophermart/pkg/logger"
 )
 
 func NewRouter(handler *chi.Mux, ls usecase.LoyalSystem, log logger.LogInterface) {

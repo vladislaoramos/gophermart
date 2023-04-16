@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/vladislaoramos/gophemart/internal/entity"
-	"github.com/vladislaoramos/gophemart/internal/repo"
-	"github.com/vladislaoramos/gophemart/internal/webapi"
-	"github.com/vladislaoramos/gophemart/pkg/auth"
-	"github.com/vladislaoramos/gophemart/pkg/logger"
+	"github.com/vladislaoramos/gophermart/internal/entity"
+	"github.com/vladislaoramos/gophermart/internal/repo"
+	"github.com/vladislaoramos/gophermart/internal/webapi"
+	"github.com/vladislaoramos/gophermart/pkg/auth"
+	"github.com/vladislaoramos/gophermart/pkg/logger"
 	"time"
 )
 

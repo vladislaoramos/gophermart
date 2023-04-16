@@ -5,8 +5,8 @@ import (
 	"fmt"
 	sq "github.com/Masterminds/squirrel"
 	"github.com/georgysavva/scany/pgxscan"
-	"github.com/vladislaoramos/gophemart/internal/entity"
-	"github.com/vladislaoramos/gophemart/pkg/postgres"
+	"github.com/vladislaoramos/gophermart/internal/entity"
+	"github.com/vladislaoramos/gophermart/pkg/postgres"
 )
 
 type LoyalSystemRepo struct {
