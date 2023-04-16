@@ -104,7 +104,7 @@ func (ls *LoyalSystemUseCase) processOrder(orderNumber string) error {
 		if err != nil {
 			return fmt.Errorf("UseCase - ProcessOrder - ls.repo.GetCurrentBalance: %w", err)
 		}
-		err = ls.repo.UpdateBalance(context.Background(), order.UserID, balance.Current.Add(order.Accrual), balance.Withdraw)
+		err = ls.repo.UpdateBalance(context.Background(), order.UserID, balance.Current+order.Accrual, balance.Withdraw)
 		if err != nil {
 			return fmt.Errorf("UseCase - ProcessOrder - ls.repo.UpdateBalance: %w", err)
 		}
@@ -215,11 +215,11 @@ func (ls *LoyalSystemUseCase) Withdraw(ctx context.Context, userID int, withdraw
 		return fmt.Errorf("UseCase - Withdraw - ls.repo.GetBalance: %w", err)
 	}
 
-	if withdrawal.Sum.GreaterThan(balance.Current) {
+	if withdrawal.Sum > balance.Current {
 		return fmt.Errorf("UseCase - Withdraw: %w", ErrPaymentRequired)
 	}
 
-	err = ls.repo.UpdateBalance(ctx, userID, balance.Current.Sub(withdrawal.Sum), balance.Withdraw.Add(withdrawal.Sum))
+	err = ls.repo.UpdateBalance(ctx, userID, balance.Current-withdrawal.Sum, balance.Withdraw+withdrawal.Sum)
 	if err != nil {
 		return fmt.Errorf("UseCase - Withdraw - ls.repo.UpdateBalance: %w", err)
 	}
