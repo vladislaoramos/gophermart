@@ -43,3 +43,6 @@ test: ## Launching tests
 
 clean: ## Cleaning building files
 	rm gophermart
+
+gen-mocks:
+	cd internal && mockery --all --case underscore --keeptree --disable-version-string --with-expecter
