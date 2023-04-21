@@ -40,8 +40,8 @@ func TestUploadOrderHandler(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		//t.Parallel()
 		user := entity.User{
-			ID:    1,
-			Login: "test",
+			ID: 1,
+			//Login: "test",
 		}
 
 		mockLoyalSystem := mocks.NewLoyalSystem(t)
