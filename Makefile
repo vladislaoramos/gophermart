@@ -2,7 +2,7 @@ GREEN='\033[0;32m'
 ORANGE='\033[0;33m'
 NC='\033[0m'
 
-PG_PORT=54320
+PG_PORT=54321
 test-db-up: ## Start postgres db in docker with PG_PORT
 	@echo ${ORANGE}"Running the test DB"${NC}
 	-docker stop gophermart-test-db
@@ -10,12 +10,12 @@ test-db-up: ## Start postgres db in docker with PG_PORT
 		postgres:12-alpine postgres -c log_statement=all
 	docker exec gophermart-test-db timeout 20s bash -c "until pg_isready -d gophermart -U gophermart; do sleep 0.5; done"
 	sleep 0.5 # need for mac
-	# migrate -source file://migrations -database postgres://gophermart:1234@127.0.0.1:$(PG_PORT)/gophermart?sslmode=disable up
+	#migrate -source file://migrations -database 'postgres://gophermart:1234@localhost:54321/postgres?sslmode=disable' up
 	@echo ${GREEN}"db up"${NC}
 
 test-db-stop: ## Stop and clean postgres
 	@echo ${ORANGE}"Stopping the test DB"${NC}
-	# migrate -source file://migrations -database postgres://gophermart:1234@127.0.0.1:$(PG_PORT)/biller?sslmode=disable down -all
+	migrate -source file://migrations -database 'postgres://gophermart:1234@localhost:54321/postgres?sslmode=disable' down -all
 	docker stop gophermart-test-db
 	@echo ${GREEN}"db down"${NC}
 
