@@ -1,0 +1,15 @@
+app:
+  name: 'gophermart'
+  version: '0.0.1'
+  workers_count: 5
+  marshal_json_without_quotes: true
+
+http:
+  address: ':8081'
+
+logger:
+  level: 'debug'
+
+postgres:
+  pool_max: 2
+  migration_dir: 'migrations'

@@ -25,4 +25,5 @@ vendor/
 # Mac OS General
 .DS_Store
 
-WORKSPACE
+# Docker volume for PostgreSQL
+postgres_data
